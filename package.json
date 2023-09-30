@@ -17,8 +17,8 @@
   "scripts": {
     "bump": "bump package.json ruten-filter.user.js -c -a -t",
     "lint": "eslint . && tsc",
-    "preversion": "npm run lint",
-    "version": "npm install"
+    "preversion": "pnpm run lint",
+    "version": "pnpm install"
   },
   "packageManager": "pnpm@8.8.0",
   "devDependencies": {
