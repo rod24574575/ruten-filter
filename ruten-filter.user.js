@@ -64,8 +64,23 @@
     /** @type {string[]} */
     const results = [];
     for (const [key, value] of Object.entries(enabledMap)) {
-      if (value === true) {
+      if (key && value === true) {
         results.push(key);
+      }
+    }
+    return results;
+  }
+
+  /**
+   * @param {string[]} enabledArray
+   * @returns {Record<string,boolean>}
+   */
+  function getEnabledMap(enabledArray) {
+    /** @type {Record<string,boolean>} */
+    const results = {};
+    for (const key of enabledArray) {
+      if (key) {
+        results[key] = true;
       }
     }
     return results;
@@ -426,20 +441,14 @@
           'Hide products that match keywords',
           getEnabledArray(settings.hideProductKeywords).join(','),
           (value) => {
-            updateSettings(
-              'hideProductKeywords',
-              Object.fromEntries(value.split(',').map((v) => [v, true])),
-            );
+            updateSettings('hideProductKeywords', getEnabledMap(value.split(',')));
           },
         )
         .addText(
           'Hide sellers by name/id',
           getEnabledArray(settings.hideSellers).join(','),
           (value) => {
-            updateSettings(
-              'hideSellers',
-              Object.fromEntries(value.split(',').map((v) => [v, true])),
-            );
+            updateSettings('hideSellers', getEnabledMap(value.split(',')));
           },
         )
         .addNumber(
