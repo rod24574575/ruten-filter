@@ -1,8 +1,8 @@
 {
-  "skipProductKeywords": {
+  "hideProductKeywords": {
     "手辦": true
   },
-  "skipSellers": {
+  "hideSellers": {
     "asd201107111": true,
     "baby1234588": true,
     "cyt112233": true,
