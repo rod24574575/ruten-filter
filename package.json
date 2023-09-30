@@ -1,0 +1,33 @@
+{
+  "name": "ruten-filter",
+  "version": "0.1.0",
+  "description": "",
+  "keywords": [
+    "userscript",
+    "ruten"
+  ],
+  "homepage": "https://github.com/rod24574575/ruten-filter",
+  "bugs": "https://github.com/rod24574575/ruten-filter/issues",
+  "license": "MIT",
+  "author": "rod24574575 <rod24574575@hotmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rod24574575/ruten-filter.git"
+  },
+  "scripts": {
+    "bump": "bump package.json ruten-filter.user.js -c -a -t",
+    "lint": "eslint . && tsc",
+    "preversion": "npm run lint",
+    "version": "npm install"
+  },
+  "packageManager": "pnpm@8.8.0",
+  "devDependencies": {
+    "@types/quicksettings": "^3.0.3",
+    "@types/tampermonkey": "^4.20.3",
+    "eslint": "^8.50.0",
+    "eslint-plugin-userscripts": "^0.4.0",
+    "typescript": "^5.2.2",
+    "version-bump-prompt": "^6.1.0"
+  },
+  "private": true
+}
