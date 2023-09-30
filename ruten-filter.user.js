@@ -12,7 +12,7 @@
 // @downloadURL  https://gist.github.com/rod24574575/b237d299261a84b23bd53637c02bbdb3/raw/ruten-filter.user.js
 // @match        *://*.ruten.com.tw/find/*
 // @run-at       document-idle
-// @resource     preset_figure https://gist.githubusercontent.com/rod24574575/1f2276f895205e75964338235b751f80/raw/figure.json
+// @resource     preset_figure https://gist.githubusercontent.com/rod24574575/1f2276f895205e75964338235b751f80/raw/22a3def83a56fe097dda15b9086ff3a92ec3f426/figure.json
 // @require      https://cdn.jsdelivr.net/npm/quicksettings@3.0.1/quicksettings.min.js
 // @grant        GM.getResourceUrl
 // @grant        GM.registerMenuCommand
