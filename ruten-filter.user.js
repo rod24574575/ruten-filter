@@ -67,7 +67,8 @@
   function getEnabledArray(enabledMap) {
     /** @type {string[]} */
     const results = [];
-    for (const [key, value] of Object.entries(enabledMap)) {
+    for (let [key, value] of Object.entries(enabledMap)) {
+      key = key.trim();
       if (key && value === true) {
         results.push(key);
       }
@@ -82,7 +83,8 @@
   function getEnabledMap(enabledArray) {
     /** @type {Record<string,boolean>} */
     const results = {};
-    for (const key of enabledArray) {
+    for (let key of enabledArray) {
+      key = key.trim();
       if (key) {
         results[key] = true;
       }
@@ -471,14 +473,14 @@
           updateSettings('hideOversea', value);
         })
         .addText(
-          'Hide products that match keywords',
+          'Hide products that match keywords (separated by comma)',
           getEnabledArray(settings.hideProductKeywords).join(','),
           (value) => {
             updateSettings('hideProductKeywords', getEnabledMap(value.split(',')));
           },
         )
         .addText(
-          'Hide sellers by name/id',
+          'Hide sellers by name/id (separated by comma)',
           getEnabledArray(settings.hideSellers).join(','),
           (value) => {
             updateSettings('hideSellers', getEnabledMap(value.split(',')));
