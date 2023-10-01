@@ -31,6 +31,7 @@
    * @property {Record<string,boolean>} presets
    * @property {boolean} hideAD
    * @property {boolean} hideRecommender
+   * @property {boolean} hideOversea
    * @property {Record<string,boolean>} hideProductKeywords
    * @property {Record<string,boolean>} hideSellers
    * @property {number} hideSellerCreditLessThan
@@ -90,6 +91,14 @@
   }
 
   /**
+   * @param {string} str
+   * @returns {string}
+   */
+  function escapeRegExp(str) {
+    return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
+  }
+
+  /**
    * @returns {Promise<Settings>}
    */
   async function loadSettings() {
@@ -98,6 +107,7 @@
       presets: {},
       hideAD: true,
       hideRecommender: true,
+      hideOversea: false,
       hideProductKeywords: {},
       hideSellers: {},
       hideSellerCreditLessThan: 0,
@@ -134,6 +144,7 @@
       presets,
       hideAD,
       hideRecommender,
+      hideOversea,
       hideProductKeywords,
       hideSellers,
       hideSellerCreditLessThan,
@@ -187,6 +198,7 @@
     return (cachedSettings = {
       hideAD,
       hideRecommender,
+      hideOversea,
       hideProductKeywords,
       hideSellers,
       hideSellerCreditLessThan,
@@ -200,19 +212,20 @@
    */
 
   /**
-   * @param {string} str
-   * @returns {string}
-   */
-  function escapeRegExp(str) {
-    return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
-  }
-
-  /**
    * @param {Element} productCard
    * @returns {any}
    */
   function getProductVueProps(productCard) {
     return /** @type {Element & { __vue__?: any }} */ (productCard).__vue__?.$props;
+  }
+
+  /**
+   * @param {Element} el
+   * @param {boolean} visible
+   */
+  function setVisible(el, visible) {
+    /** @type {ElementWithStyle} */
+    (el).style.display = visible ? '' : 'none';
   }
 
   /**
@@ -229,6 +242,14 @@
    */
   function isRecommender(productCard) {
     return !!productCard.querySelector('.recommender-keyword');
+  }
+
+  /**
+   * @param {Element} productCard
+   * @returns {boolean}
+   */
+  function isOversea(productCard) {
+    return !!getProductVueProps(productCard)?.item?.ifOversea;
   }
 
   /**
@@ -310,8 +331,7 @@
     if (!wrapper) {
       return;
     }
-    /** @type {ElementWithStyle} */
-    (wrapper).style.display = visible ? '' : 'none';
+    setVisible(wrapper, visible);
   }
 
   /**
@@ -321,34 +341,41 @@
     const {
       hideAD,
       hideRecommender,
+      hideOversea,
       hideProductKeywordMatcher,
       hideSellerSet,
       hideSellerCreditLessThan,
     } = await ensureSettings(force);
 
-    const productCards = document.querySelectorAll('.rt-product-card');
-    if (productCards.length === 0) {
-      return;
+    const overseaContainers = document.querySelectorAll('.ebay-result-container');
+    if (overseaContainers.length > 0) {
+      for (const el of overseaContainers) {
+        setVisible(el, !hideOversea);
+      }
     }
 
-    const visibles = [...productCards].map((productCard) => {
-      try {
-        return !(
-          (hideAD && isAd(productCard)) ||
-          (hideRecommender && isRecommender(productCard)) ||
-          (hideProductKeywordMatcher &&
-            isProduceKeywordMatch(productCard, hideProductKeywordMatcher)) ||
-          (hideSellerSet && isSellers(productCard, hideSellerSet)) ||
-          (hideSellerCreditLessThan > 0 &&
-            isSellerCreditLessThan(productCard, hideSellerCreditLessThan))
-        );
-      } catch (e) {
-        console.warn(e);
-        return true;
+    const productCards = document.querySelectorAll('.rt-product-card');
+    if (productCards.length > 0) {
+      const visibles = [...productCards].map((productCard) => {
+        try {
+          return !(
+            (hideAD && isAd(productCard)) ||
+            (hideRecommender && isRecommender(productCard)) ||
+            (hideOversea && isOversea(productCard)) ||
+            (hideProductKeywordMatcher &&
+              isProduceKeywordMatch(productCard, hideProductKeywordMatcher)) ||
+            (hideSellerSet && isSellers(productCard, hideSellerSet)) ||
+            (hideSellerCreditLessThan > 0 &&
+              isSellerCreditLessThan(productCard, hideSellerCreditLessThan))
+          );
+        } catch (e) {
+          console.warn(e);
+          return true;
+        }
+      });
+      for (let i = productCards.length - 1; i >= 0; --i) {
+        setProductVisible(productCards[i], visibles[i]);
       }
-    });
-    for (let i = productCards.length - 1; i >= 0; --i) {
-      setProductVisible(productCards[i], visibles[i]);
     }
   }
 
@@ -439,6 +466,9 @@
         })
         .addBoolean('Hide recommender', settings.hideRecommender, (value) => {
           updateSettings('hideRecommender', value);
+        })
+        .addBoolean('Hide oversea', settings.hideOversea, (value) => {
+          updateSettings('hideOversea', value);
         })
         .addText(
           'Hide products that match keywords',
