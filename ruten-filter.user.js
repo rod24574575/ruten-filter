@@ -497,12 +497,11 @@
         .addButton('Apply', apply)
         .addButton('Cancel', cancel);
 
-      Object.assign(/** @type {*} */ (panel)._panel.style, {
-        position: 'absolute',
-        left: '50%',
-        top: '50%',
-        transform: 'translate(-50%, -50%)',
-      });
+      const { width: wrapperWidth, height: wrapperHeight } = wrapper.getBoundingClientRect();
+      const { width, height } = /** @type {typeof panel & { _panel: Element } } */ (
+        panel
+      )._panel.getBoundingClientRect();
+      panel.setPosition((wrapperWidth - width) / 2, (wrapperHeight - height) / 2);
     });
   }
 
