@@ -11,6 +11,8 @@
 // @updateURL    https://gist.github.com/rod24574575/b237d299261a84b23bd53637c02bbdb3/raw/ruten-filter.user.js
 // @downloadURL  https://gist.github.com/rod24574575/b237d299261a84b23bd53637c02bbdb3/raw/ruten-filter.user.js
 // @match        *://*.ruten.com.tw/find/*
+// @match        *://*.ruten.com.tw/category/*
+// @match        *://*.ruten.com.tw/item/*
 // @run-at       document-idle
 // @resource     preset_figure https://gist.githubusercontent.com/rod24574575/1f2276f895205e75964338235b751f80/raw/22a3def83a56fe097dda15b9086ff3a92ec3f426/figure.json
 // @require      https://cdn.jsdelivr.net/npm/quicksettings@3.0.1/quicksettings.min.js
@@ -21,6 +23,7 @@
 // ==/UserScript==
 
 // @ts-check
+'use strict';
 
 (function () {
   /**
@@ -205,40 +208,36 @@
   }
 
   /**
-   * @param {Element} productItem
+   * @param {Element} productCard
    * @returns {any}
    */
-  function getProductVueProps(productItem) {
-    const product = productItem.firstElementChild;
-    if (!product) {
-      return undefined;
-    }
-    return /** @type {Element & { __vue__?: any }} */ (product).__vue__?.$props;
+  function getProductVueProps(productCard) {
+    return /** @type {Element & { __vue__?: any }} */ (productCard).__vue__?.$props;
   }
 
   /**
-   * @param {Element} productItem
+   * @param {Element} productCard
    * @returns {boolean}
    */
-  function isAd(productItem) {
-    return !!productItem.querySelector('.rt-product-card-ad-tag');
+  function isAd(productCard) {
+    return !!productCard.querySelector('.rt-product-card-ad-tag');
   }
 
   /**
-   * @param {Element} productItem
+   * @param {Element} productCard
    * @returns {boolean}
    */
-  function isRecommender(productItem) {
-    return !!productItem.querySelector('.recommender-keyword');
+  function isRecommender(productCard) {
+    return !!productCard.querySelector('.recommender-keyword');
   }
 
   /**
-   * @param {Element} productItem
+   * @param {Element} productCard
    * @param {RegExp} matcher
    * @returns {boolean}
    */
-  function isProduceKeywordMatch(productItem, matcher) {
-    const name = getProductVueProps(productItem)?.item?.name;
+  function isProduceKeywordMatch(productCard, matcher) {
+    const name = getProductVueProps(productCard)?.item?.name;
     if (!name) {
       return false;
     }
@@ -246,12 +245,12 @@
   }
 
   /**
-   * @param {Element} productItem
+   * @param {Element} productCard
    * @param {Set<number|string>} storeSet
    * @returns {boolean}
    */
-  function isSellers(productItem, storeSet) {
-    const sellerInfo = getProductVueProps(productItem)?.item?.sellerInfo;
+  function isSellers(productCard, storeSet) {
+    const sellerInfo = getProductVueProps(productCard)?.item?.sellerInfo;
     if (!sellerInfo) {
       return false;
     }
@@ -279,13 +278,13 @@
   }
 
   /**
-   * @param {Element} productItem
+   * @param {Element} productCard
    * @param {number} value
    * @returns {boolean}
    */
-  function isSellerCreditLessThan(productItem, value) {
+  function isSellerCreditLessThan(productCard, value) {
     /** @type {unknown} */
-    const rawCredit = getProductVueProps(productItem)?.item?.sellerInfo?.sellerCredit;
+    const rawCredit = getProductVueProps(productCard)?.item?.sellerInfo?.sellerCredit;
 
     /** @type {number} */
     let credit;
@@ -303,12 +302,16 @@
   }
 
   /**
-   * @param {Element} productItem
+   * @param {Element} productCard
    * @param {boolean} visible
    */
-  function setProductVisible(productItem, visible) {
+  function setProductVisible(productCard, visible) {
+    const wrapper = productCard.closest('.rt-slideshow-inner > *, .search-result-container > *');
+    if (!wrapper) {
+      return;
+    }
     /** @type {ElementWithStyle} */
-    (productItem).style.display = visible ? '' : 'none';
+    (wrapper).style.display = visible ? '' : 'none';
   }
 
   /**
@@ -323,29 +326,29 @@
       hideSellerCreditLessThan,
     } = await ensureSettings(force);
 
-    const productItems = document.querySelectorAll('.product-item');
-    if (productItems.length === 0) {
+    const productCards = document.querySelectorAll('.rt-product-card');
+    if (productCards.length === 0) {
       return;
     }
 
-    const visibles = [...productItems].map((productItem) => {
+    const visibles = [...productCards].map((productCard) => {
       try {
         return !(
-          (hideAD && isAd(productItem)) ||
-          (hideRecommender && isRecommender(productItem)) ||
+          (hideAD && isAd(productCard)) ||
+          (hideRecommender && isRecommender(productCard)) ||
           (hideProductKeywordMatcher &&
-            isProduceKeywordMatch(productItem, hideProductKeywordMatcher)) ||
-          (hideSellerSet && isSellers(productItem, hideSellerSet)) ||
+            isProduceKeywordMatch(productCard, hideProductKeywordMatcher)) ||
+          (hideSellerSet && isSellers(productCard, hideSellerSet)) ||
           (hideSellerCreditLessThan > 0 &&
-            isSellerCreditLessThan(productItem, hideSellerCreditLessThan))
+            isSellerCreditLessThan(productCard, hideSellerCreditLessThan))
         );
       } catch (e) {
         console.warn(e);
         return true;
       }
     });
-    for (let i = productItems.length - 1; i >= 0; --i) {
-      setProductVisible(productItems[i], visibles[i]);
+    for (let i = productCards.length - 1; i >= 0; --i) {
+      setProductVisible(productCards[i], visibles[i]);
     }
   }
 
