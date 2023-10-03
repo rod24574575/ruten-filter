@@ -2,7 +2,7 @@
 // @name         Custom Filter for Ruten
 // @namespace    https://github.com/rod24574575
 // @description  Add additional custom front-end filters for ruten.com.tw.
-// @version      0.2.0
+// @version      0.2.1
 // @license      MIT
 // @author       rod24574575
 // @homepage     https://github.com/rod24574575/ruten-filter
