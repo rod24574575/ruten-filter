@@ -242,14 +242,6 @@
    * @param {Element} productCard
    * @returns {boolean}
    */
-  function isRecommender(productCard) {
-    return !!productCard.querySelector('.recommender-keyword');
-  }
-
-  /**
-   * @param {Element} productCard
-   * @returns {boolean}
-   */
   function isOversea(productCard) {
     return !!getProductVueProps(productCard)?.item?.ifOversea;
   }
@@ -356,13 +348,19 @@
       }
     }
 
+    const recommenders = document.querySelectorAll('.recommender-keyword');
+    if (recommenders.length > 0) {
+      for (const el of recommenders) {
+        setVisible(el, !hideRecommender);
+      }
+    }
+
     const productCards = document.querySelectorAll('.rt-product-card');
     if (productCards.length > 0) {
       const visibles = [...productCards].map((productCard) => {
         try {
           return !(
             (hideAD && isAd(productCard)) ||
-            (hideRecommender && isRecommender(productCard)) ||
             (hideOversea && isOversea(productCard)) ||
             (hideProductKeywordMatcher &&
               isProduceKeywordMatch(productCard, hideProductKeywordMatcher)) ||
