@@ -351,7 +351,7 @@
     const recommenders = document.querySelectorAll('.recommender-keyword');
     if (recommenders.length > 0) {
       for (const el of recommenders) {
-        setVisible(el, !hideRecommender);
+        setProductVisible(el, !hideRecommender);
       }
     }
 
