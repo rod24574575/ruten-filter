@@ -14,7 +14,7 @@
 // @match        *://*.ruten.com.tw/category/*
 // @match        *://*.ruten.com.tw/item/*
 // @run-at       document-idle
-// @resource     preset_figure https://gist.githubusercontent.com/rod24574575/1f2276f895205e75964338235b751f80/raw/4de5a2cd6e15ce4bffc9256a65e1180fc8cfaf3c/figure.json
+// @resource     preset_figure https://gist.githubusercontent.com/rod24574575/1f2276f895205e75964338235b751f80/raw/5961aef86dc3440d3950f6414c2aee7d1a73231c/figure.json
 // @require      https://cdn.jsdelivr.net/npm/quicksettings@3.0.1/quicksettings.min.js
 // @grant        GM.getResourceUrl
 // @grant        GM.registerMenuCommand
